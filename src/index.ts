@@ -7,7 +7,7 @@ const PORTA = 3333;
 
 app.use(express.json()); 
 
-app.use('/tarefas', tarefasRoutes)
+app.use('/tasks', tarefasRoutes)
 
 app.listen(PORTA, () => {
   console.log(`🚀 Servidor rodando na porta ${PORTA}`);

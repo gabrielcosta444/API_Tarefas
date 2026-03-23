@@ -4,9 +4,14 @@ import { TarefaController } from "../domains/tarefas/controllers/TarefaControlle
 const tarefasRoutes = Router();
 const controller = new TarefaController;
 
-tarefasRoutes.post('/tasks', controller.create);
+tarefasRoutes.post('/', controller.createTask);
 
+tarefasRoutes.get('/', controller.getTasks);
+tarefasRoutes.get('/:id', controller.getTask);
 
-tarefasRoutes.get('/tasks', controller.list);
+tarefasRoutes.put('/:id', controller.editTask);
+
+tarefasRoutes.delete('/:id', controller.removeTask);
+
 
 export {tarefasRoutes};
