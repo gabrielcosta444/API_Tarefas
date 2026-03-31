@@ -1,14 +1,7 @@
-import express from 'express';
-import { tarefasRoutes } from './routes/tarefa.routes';
+import "dotenv/config";
+import { app } from "./config/expressConfig";
 
 
-const app = express();
-const PORTA = 3333;
-
-app.use(express.json()); 
-
-app.use('/tasks', tarefasRoutes)
-
-app.listen(PORTA, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORTA}`);
+app.listen(3030, () => {
+  console.log(`🚀 Servidor rodando na porta 3030`);
 });

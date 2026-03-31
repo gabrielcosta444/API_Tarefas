@@ -1,74 +1,79 @@
-interface ICriarTarefa{
-    nome: string;
-    descricao: string;
+import { prisma } from "../../../config/prismaClient";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+
+interface ITarefa{
+    title: string;
+    description: string;
 }
-
-interface ITarefa {
-  id: number;
-  nome: string;
-  descricao: string;
-  concluida: boolean;
-}
-
-const tarefas: ITarefa[] = [];
-
 
 
 class TarefaService{
 
-    createTask({nome, descricao}: ICriarTarefa): ITarefa{
+    async createTask({title, description}: ITarefa){
 
-        if(!nome){
-            throw new Error ('Nome da tarefa é obrigatório.');
+        if(!title){
+            throw new Error ('Título da tarefa é obrigatório.');
         }
 
-        const novaTarefa: ITarefa = {
-            nome,
-            descricao,
-            id: Math.random(),
-            concluida: false
+        try{
+            return await prisma.task.create({
+                data: {
+                    title: title,
+                    description: description
+                }
+            })
+        } catch(error){
+            throw error;
         }
-
-        tarefas.push(novaTarefa);
-
-        return novaTarefa;
+        
     }
 
-    getTasks(){
-        return tarefas;
+    async getTasks(){
+        try{
+            return await prisma.task.findMany();
+        }catch(error){
+            throw error;
+        }
     }
 
-    getTask(id: number){
-        for(let i: number = 0; i < tarefas.length; i++){
-            if(tarefas[i]?.id == id){
-                return tarefas[i];
+    async getTask(id: number){
+        try{
+            const task = await prisma.task.findUnique({ where: { id } });
+            if(!task){
+                throw new Error('Tarefa não encontrada.');
             }
+            return task;
+        } catch (error){
+            throw error;
         }
-        throw new Error ('Tarefa não encontrada.');
     }
 
-    editTask(id: number, {nome, descricao}: ICriarTarefa){
-        for(let i: number = 0; i < tarefas.length; i++){
-            if(tarefas[i]?.id == id){
-                tarefas[i]!.nome = nome;
-                tarefas[i]!.descricao = descricao;
-                return tarefas[i];
+    async editTask(id: number, {title, description}: ITarefa){
+        try{
+            return await prisma.task.update({ where: {id}, data: {
+                title: title,
+                description: description
+            } })
+        }catch(error){
+            if(error instanceof PrismaClientKnownRequestError && error.code === 'P2025'){
+                throw new Error ('Tarefa não encontrada.');
             }
+
+            throw error;
         }
-        throw new Error ('Tarefa não encontrada.');
     }
 
-    removeTask(id: number){
-        for(let i: number = 0; i < tarefas.length; i++){
-            if(tarefas[i]?.id == id){
-                tarefas.splice(i, 1);
-                return;
+    async removeTask(id: number){
+        try{
+            await prisma.task.delete({ where: {id} });
+        } catch(error){
+            if(error instanceof PrismaClientKnownRequestError && error.code === 'P2025'){
+                throw new Error ('Tarefa não encontrada.');
             }
-        }
 
-        throw new Error ('Tarefa não encontrada.');
+            throw error;
+        }
     }
 
 }
-
 export {TarefaService};
